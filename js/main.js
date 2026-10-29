@@ -1,6 +1,7 @@
 /*
  * Yapılabilir Robotlar — sayfa mantığı
  * Tüm içerik data/projects.js içindeki PROJECTS dizisinden üretilir.
+ * Filtre, proje paneli ve proje gezinmesi js/nav.js içinde.
  * Harici kütüphane yok: IntersectionObserver + requestAnimationFrame + CSS geçişleri.
  */
 (function () {
@@ -84,9 +85,11 @@
 
   /* ------------------------------------------------------------ render: çipler */
   function renderChips() {
-    var html = '<button class="chip" type="button" data-filter="all" aria-pressed="true">Tümü</button>';
+    var count = function (k) { return PROJECTS.filter(function (p) { return p.category === k; }).length; };
+    var html = '<button class="chip" type="button" data-filter="all" aria-pressed="true">Tümü<span class="chip__count">' + PROJECTS.length + '</span></button>';
     Object.keys(CATS).forEach(function (k) {
-      html += '<button class="chip" type="button" data-filter="' + k + '" data-cat="' + k + '" aria-pressed="false">' + icon(CATS[k].icon) + esc(CATS[k].label) + '</button>';
+      html += '<button class="chip" type="button" data-filter="' + k + '" data-cat="' + k + '" aria-pressed="false">' + icon(CATS[k].icon) + esc(CATS[k].label) +
+        '<span class="chip__count">' + count(k) + '</span></button>';
     });
     $('#chips').innerHTML = html;
   }
@@ -235,7 +238,8 @@
       blk('print', 'Baskı bilgisi', facts(p.print)) +
       extraBlock(p) +
       videosBlock(p) + warn + links +
-      '</div></div></article>';
+      '</div><nav class="pnav" aria-label="Proje gezinme"><a class="pnav__link pnav__link--prev" data-dir="prev" href="#"></a>' +
+      '<a class="pnav__link pnav__link--next" data-dir="next" href="#"></a></nav></div></article>';
   }
 
   function renderDetails() {
@@ -363,48 +367,6 @@
       entries.forEach(function (en) { if (en.isIntersecting) mark(null); });
     }, { rootMargin: '-45% 0px -50% 0px' });
     ['#top', '#genel-bakis', '#karsilastirma'].forEach(function (s) { off.observe($(s)); });
-  }
-
-  /* ------------------------------------------------------------ filtre (FLIP animasyonu) */
-  function initFilter() {
-    var chips = $$('#chips .chip'), cards = $$('#grid .card'), empty = $('#grid-empty');
-    function apply(filter) {
-      chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-filter') === filter)); });
-      var show = function (card) { return filter === 'all' || card.getAttribute('data-cat') === filter; };
-      if (REDUCE) {
-        cards.forEach(function (c) { c.classList.toggle('is-hidden', !show(c)); });
-        empty.hidden = cards.some(show);
-        return;
-      }
-      var first = new Map();
-      cards.forEach(function (c) { if (!c.classList.contains('is-hidden')) first.set(c, c.getBoundingClientRect()); });
-      var leaving = cards.filter(function (c) { return !show(c) && !c.classList.contains('is-hidden'); });
-      leaving.forEach(function (c) { c.classList.add('is-leaving'); });
-      setTimeout(function () {
-        leaving.forEach(function (c) { c.classList.add('is-hidden'); c.classList.remove('is-leaving'); });
-        cards.forEach(function (c) { if (show(c)) c.classList.remove('is-hidden'); });
-        empty.hidden = cards.some(show);
-        cards.forEach(function (c) {
-          if (c.classList.contains('is-hidden')) return;
-          var last = c.getBoundingClientRect(), f = first.get(c);
-          c.style.transition = 'none';
-          if (f) c.style.transform = 'translate(' + (f.left - last.left) + 'px,' + (f.top - last.top) + 'px)';
-          else { c.style.opacity = '0'; c.style.transform = 'scale(.94)'; }
-        });
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            cards.forEach(function (c) {
-              c.style.transition = 'transform .55s cubic-bezier(.16,1,.3,1), opacity .4s ease';
-              c.style.transform = ''; c.style.opacity = '';
-            });
-          });
-        });
-      }, leaving.length ? 230 : 0);
-    }
-    $('#chips').addEventListener('click', function (e) {
-      var chip = e.target.closest('.chip');
-      if (chip) apply(chip.getAttribute('data-filter'));
-    });
   }
 
   /* ------------------------------------------------------------ galeri + lightbox */
@@ -585,6 +547,9 @@
     });
   }
 
+  /* nav.js (filtre, proje paneli) bu yardımcıları kullanır */
+  window.SITE = { PROJECTS: PROJECTS, CATS: CATS, REDUCE: REDUCE, $: $, $$: $$, esc: esc, icon: icon, sectionId: sectionId };
+
   /* ------------------------------------------------------------ başlat */
   renderChips();
   renderGrid();
@@ -596,7 +561,6 @@
   initCounters();
   initScroll();
   initCurrentCategory();
-  initFilter();
   initGalleries();
   initCollapsibles();
   initCopy();

@@ -1,4 +1,6 @@
-# Yapılabilir Robotlar: 12 Açık Kaynak Proje
+# Dicle Mechatronics Projeleri: 12 Açık Kaynak Proje
+
+Canlı site: https://mert0916.github.io/mechatronics-baskilari/
 
 3D yazıcıyla basılıp hobi elektroniğiyle yapılabilen 12 açık kaynak robotik/RC projesini tanıtan, tek sayfalık statik bir web sitesi. Her proje için ne olduğu, malzeme listesi (BOM), baskı ayarları, yapım adımları, videolar ve orijinal kaynak bağlantıları bir arada.
 
@@ -10,10 +12,18 @@ Saf HTML + CSS + JavaScript; framework, build adımı veya `npm install` yok. Te
 index.html          sayfa iskeleti ve SVG ikon seti
 css/style.css       tüm stiller (renkler :root içinde)
 js/main.js          sayfayı veriden üreten ve animasyonları yöneten kod
+js/nav.js           kategori filtresi, sol proje paneli, önceki/sonraki proje gezinmesi
 data/projects.js    tüm proje verisi (tek dizi)
 images/             proje görselleri (PNG/JPG + WebP)
 images/ui/          logo / favicon
 ```
+
+## Gezinme
+
+- Üst çubuktaki **Tümü / Hava / Robot Kol / Kara / Yürüyen & Servis** çipleri tüm sayfayı süzer: kartlar, detay bölümleri ve karşılaştırma tablosu yalnızca o kategorinin projelerini gösterir.
+- Seçilen kategori adrese yazılır; `?kategori=air`, `arm`, `ground` veya `walk` ile paylaşılan bağlantı doğrudan o filtreyle açılır.
+- **Projeler** düğmesi soldan açılan paneli açar: 01–12 arası tüm projeler listelenir, tıklanan projenin bölümüne kaydırılır. Proje filtre dışındaysa filtre otomatik kaldırılır. Panel Esc ile kapanır.
+- Her proje bölümünün sonunda önceki/sonraki proje bağlantıları vardır (filtre açıksa yalnızca o kategori içinde gezer).
 
 ## Yerelde açma
 
