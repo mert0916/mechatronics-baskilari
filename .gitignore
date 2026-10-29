@@ -1,0 +1,8 @@
+SITE-PROMPT.md
+images/originals/
+
+# yerel araç / editör klasörleri
+.claude/
+.claude-flow/
+.impeccable/
+.swarm/
